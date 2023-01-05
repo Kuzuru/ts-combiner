@@ -11,7 +11,6 @@ var Args struct {
 	Filename    string `arg:"-f, --filename, required" help:"file URL"`
 	LastSegment int    `arg:"-l, --last, required" help:"last *.ts file (download from 1 to Last)"`
 	SaveFolder  string `arg:"-s, --save, required" help:"folder to save files"`
-	Output      string `arg:"-o, --output, required" help:"output file name"`
 	Verbose     bool   `arg:"-v, --verbose" help:"verbosity level"`
 }
 
@@ -38,9 +37,7 @@ func Main() error {
 		fmt.Printf("[LOG] Combining %d segments...", Args.LastSegment)
 	}
 
-	pkg.Combine(Args.SaveFolder, Args.Output, inputs, Args.Verbose)
-
-	pkg.Remove(Args.SaveFolder)
+	pkg.Combine(Args.SaveFolder, inputs, Args.Verbose)
 
 	fmt.Println("[LOG] Done! You can now launch combine.cmd")
 
