@@ -1,19 +1,34 @@
 package pkg
 
 import (
+	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
 )
 
-func Download(url string, segmentNum int) error {
-	fmt.Println("Downloading", url)
+func Download(url, saveFolder string, segmentNum int, isVerbose bool) error {
+	url += strconv.Itoa(segmentNum) + ".ts"
 
-	out, err := os.Create(strconv.Itoa(segmentNum) + ".ts")
+	if isVerbose {
+		fmt.Println("[LOG] Downloading", url)
+	}
+
+	// If save folder does not exist, create it
+	if _, err := os.Stat(saveFolder); errors.Is(err, os.ErrNotExist) {
+		err := os.Mkdir(saveFolder, os.ModePerm)
+		if err != nil {
+			log.Fatalln("[ERR] Error creating save folder:", err)
+		}
+	}
+
+	// TODO: Make smth better than this shit
+	out, err := os.Create("./" + saveFolder + "/" + strconv.Itoa(segmentNum) + ".ts")
 	if err != nil {
-		fmt.Println("Error creating file:", err)
+		log.Fatalln("[ERR] Error creating file:", err)
 		return err
 	}
 
@@ -26,7 +41,7 @@ func Download(url string, segmentNum int) error {
 
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Println("Error downloading:", err)
+		log.Fatalln("[ERR] Error downloading:", err)
 		return err
 	}
 
@@ -39,7 +54,7 @@ func Download(url string, segmentNum int) error {
 
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
-		fmt.Println("Error writing to file:", err)
+		log.Fatalln("[ERR] Error writing to file:", err)
 		return err
 	}
 
