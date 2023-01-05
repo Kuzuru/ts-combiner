@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-func Download(url, saveFolder string, segmentNum int, isVerbose bool) error {
+func Download(url, saveFolder string, segmentNum int, isVerbose bool, done chan bool) error {
 	url += strconv.Itoa(segmentNum) + ".ts"
 
 	if isVerbose {
@@ -57,6 +57,8 @@ func Download(url, saveFolder string, segmentNum int, isVerbose bool) error {
 		log.Fatalln("[ERR] Error writing to file:", err)
 		return err
 	}
+
+	done <- true
 
 	return nil
 }

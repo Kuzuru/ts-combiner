@@ -2,8 +2,6 @@ package app
 
 import (
 	"fmt"
-	"log"
-
 	"github.com/Kuzuru/ts-combiner/pkg"
 	"github.com/alexflint/go-arg"
 )
@@ -24,12 +22,14 @@ func Main() error {
 		fmt.Printf("[LOG] DL URL: %s*.ts (* <- from 1 to %d)\n", Args.Filename, Args.LastSegment)
 	}
 
+	done := make(chan bool, Args.LastSegment)
+
 	for i := 1; i <= Args.LastSegment; i++ {
-		err := pkg.Download(Args.Filename, Args.SaveFolder, i, Args.Verbose)
-		if err != nil {
-			log.Fatalln("[ERR] error while downloading file:", err)
-			return err
-		}
+		go pkg.Download(Args.Filename, Args.SaveFolder, i, Args.Verbose, done)
+	}
+
+	for i := 1; i <= Args.LastSegment; i++ {
+		<-done
 	}
 
 	return nil
