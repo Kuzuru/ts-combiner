@@ -9,6 +9,6 @@ import (
 func main() {
 	err := app.Main()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("[ERR] Main.go: ", err)
 	}
 }
